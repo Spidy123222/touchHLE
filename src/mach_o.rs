@@ -242,7 +242,9 @@ impl MachO {
                         // check it's where we expect it to be.
                         "__PAGEZERO" => {
                             assert!(vmaddr == 0);
-                            assert!(vmsize == Mem::NULL_PAGE_SIZE);
+                            // Don't check for matching size: we are now using
+                            // a larger null page than is standard.
+                            //assert!(vmsize == Mem::NULL_PAGE_SIZE);
                             assert!(filesize == 0);
                             false
                         }

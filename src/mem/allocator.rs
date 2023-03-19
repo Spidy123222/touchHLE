@@ -96,17 +96,11 @@ pub struct Allocator {
 
 impl Allocator {
     pub fn new() -> Allocator {
-        let null_page = Chunk::new(0, Mem::NULL_PAGE_SIZE);
-        let main_thread_stack =
-            Chunk::new(Mem::MAIN_THREAD_STACK_LOW_END, Mem::MAIN_THREAD_STACK_SIZE);
-        let rest = Chunk::new(
-            Mem::NULL_PAGE_SIZE,
-            Mem::MAIN_THREAD_STACK_LOW_END - Mem::NULL_PAGE_SIZE,
-        );
+        let null_page = Chunk::new(0, Mem::NULL_PAGE_SIZE.try_into().unwrap());
 
         Allocator {
-            used_chunks: vec![null_page, main_thread_stack],
-            unused_chunks: vec![rest],
+            used_chunks: vec![null_page],
+            unused_chunks: vec![],
         }
     }
 

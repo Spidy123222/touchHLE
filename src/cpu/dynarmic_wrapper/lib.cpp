@@ -149,10 +149,7 @@ public:
       // TODO: Eventually we should use dynarmic's true fastmem mode, but that
       // requires using mmap/mprotect/etc on the host OS so we can still catch
       // null pointer accesses.
-      page_table.fill((std::uint8_t *)direct_memory_access_ptr);
-      // Note that the null page size is also defined in src/mem.rs.
-      static_assert(1 << Dynarmic::A32::UserConfig::PAGE_BITS == 0x1000);
-      page_table[0] = nullptr;
+      page_table.fill(nullptr);;
       user_config.page_table = &page_table;
       user_config.absolute_offset_page_table = true;
     }
