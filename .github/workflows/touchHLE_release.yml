@@ -20,7 +20,7 @@ jobs:
         fetch-depth: 0 # touchHLE's git-describe versioning needs tag history
     - name: Get Submodules
       run: git submodule update --init
-    - name: Install Boost
+    - name: Install Dependencies
       run: brew install boost mingw-w64
     - name: Fetch Toolchains
       run: rustup target add x86_64-unknown-linux-gnu && rustup target add x86_64-pc-windows-gnu
