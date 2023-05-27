@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-osx:
+  build-TouchHLE:
 
     runs-on: macos-latest
 
@@ -20,8 +20,23 @@ jobs:
         fetch-depth: 0 # touchHLE's git-describe versioning needs tag history
     - name: Get Submodules
       run: git submodule update --init
+
     - name: Install Dependencies
       run: brew install boost mingw-w64
+
+    - name: Try to get cached copy of Boost
+      id: cache-boost
+      uses: actions/cache@v3
+      with:
+        path: vendor\boost
+        key: boost_1_81_0
+    - if: ${{ steps.cache-boost.outputs.cache-hit != 'true' }}
+      name: Download Boost
+      run: curl -L -o boost_1_81_0.7z "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.7z"
+    - if: ${{ steps.cache-boost.outputs.cache-hit != 'true' }}
+      name: Extract Boost
+      run: 7z -ovendor x boost_1_81_0.7z && ren vendor\boost_1_81_0 boost
+
     - name: Fetch Toolchains
       run: rustup target add x86_64-unknown-linux-gnu && rustup target add x86_64-pc-windows-gnu
 
@@ -31,7 +46,7 @@ jobs:
       with:
         name: touchHLE_macOS_x86_64
         path: touchHLE
-        
+
     - name: Build Windows
       run: rm ./touchHLE && cargo build --release --target x86_64-pc-windows-gnu && mv target/releasex86_64-linux-gnu/touchHLE .
     - uses: actions/upload-artifact@v3
