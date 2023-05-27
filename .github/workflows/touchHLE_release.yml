@@ -23,7 +23,8 @@ jobs:
     - name: Install Boost
       run: brew install boost
     - name: Fetch Toolchains
-      run: rustup target add x86_64-unknown-linux-gnu && rustup target add x86_64-pc-windows-msvc
+      run: rustup target add x86_64-unknown-linux-gnu && rustup target add x86_64-pc-windows-gnullvm
+
     - name: Build MacOS
       run: cargo build --release && mv target/release/touchHLE .
     - uses: actions/upload-artifact@v3
@@ -32,7 +33,7 @@ jobs:
         path: touchHLE
         
     - name: Build Windows
-      run: rm ./touchHLE && cargo build --release --target x86_64-pc-windows-msvc && mv target/releasex86_64-linux-gnu/touchHLE .
+      run: rm ./touchHLE && cargo build --release --target x86_64-pc-windows-gnullvm && mv target/releasex86_64-linux-gnu/touchHLE .
     - uses: actions/upload-artifact@v3
       with:
         name: touchHLE_Windows_x86_64
