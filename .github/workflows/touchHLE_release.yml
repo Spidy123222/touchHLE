@@ -48,15 +48,15 @@ jobs:
 #        path: touchHLE
 
     - name: Build Windows
-      run: cargo build --release --target x86_64-pc-windows-gnu && mv target/releasex86_64-linux-gnu/touchHLE .
+      run: cargo build --release --target x86_64-pc-windows-gnu --no-default-features && mv target/x86_64-pc-windows-gnu .
     - uses: actions/upload-artifact@v3
       with:
         name: touchHLE_Windows_x86_64
-        path: touchHLE.exe
+        path: x86_64-pc-windows-gnu
         
     - name: Build Linux
-      run: rm ./touchHLE && cargo build --release --target x86_64-unknown-linux-gnu --no-default-features && mv target/releasex86_64-linux-gnu/touchHLE .
+      run: rm ./touchHLE && cargo build --release --target x86_64-unknown-linux-gnu --no-default-features && mv target/x86_64-linux-gnu .
     - uses: actions/upload-artifact@v3
       with:
         name: touchHLE_linux_x86_64
-        path: touchHLE
+        path: x86_64-linux-gnu
