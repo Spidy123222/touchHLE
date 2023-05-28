@@ -72,9 +72,9 @@ fn main() {
 
     // see also src/audio/openal.rs
     link_lib(if cfg!(target_os = "windows") {
-        "openal"
+        "OpenAL32"
     } else {
-        "openal"
+        "OpenAL32"
     });
     // rerun-if-changed seems to not work if pointed to a directory :(
     //rerun_if_changed(&workspace_root.join("vendor/openal-soft"));
