@@ -22,7 +22,7 @@ jobs:
       run: git submodule update --init
 
     - name: Install Dependencies
-      run: brew install boost mingw-w64 && wget https://github.com/macports/macports-base/releases/download/v2.7.1/MacPorts-2.7.1-11-BigSur.pkg && sudo installer -pkg ./MacPorts-2.7.1-11-BigSur.pkg -target / && sudo port install openal 
+      run: brew install boost mingw-w64 && wget https://github.com/macports/macports-base/releases/download/v2.8.1/MacPorts-2.8.1-13-Ventura.pkg && sudo installer -pkg ./MacPorts-2.7.1-11-BigSur.pkg -target / && sudo port install openal 
 
     - name: Try to get cached copy of Boost
       id: cache-boost
