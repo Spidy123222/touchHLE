@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-osx:
+  build-TouchHLE:
 
     runs-on: macos-latest
 
@@ -20,25 +20,10 @@ jobs:
         fetch-depth: 0 # touchHLE's git-describe versioning needs tag history
     - name: Get Submodules
       run: git submodule update --init
-    - name: Install Boost
-      run: brew install boost
-    - name: Build
-      run: cargo build --release && mv target/release/touchHLE .
-    - uses: actions/upload-artifact@v3
-      with:
-        name: touchHLE_macOS_x86_64
-        path: touchHLE
 
-  build-win:
+    - name: Install Dependencies
+      run: brew install boost mingw-w64 && wget https://github.com/macports/macports-base/releases/download/v2.8.1/MacPorts-2.8.1-12-Monterey.pkg && sudo installer -pkg ./MacPorts-2.8.1-12-Monterey.pkg -target / && port install openal 
 
-    runs-on: windows-latest
-
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0 # touchHLE's git-describe versioning needs tag history
-    - name: Get Submodules
-      run: git submodule update --init
     - name: Try to get cached copy of Boost
       id: cache-boost
       uses: actions/cache@v3
@@ -50,10 +35,28 @@ jobs:
       run: curl -L -o boost_1_81_0.7z "https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.7z"
     - if: ${{ steps.cache-boost.outputs.cache-hit != 'true' }}
       name: Extract Boost
-      run: 7z -ovendor x boost_1_81_0.7z && ren vendor\boost_1_81_0 boost
-    - name: Build
-      run: cargo build --release && move target/release/touchHLE.exe .
+      run: 7z -ovendor x boost_1_81_0.7z && mv ./vendor/boost_1_81_0 ./vendor/boost
+
+    - name: Fetch Toolchains
+      run: rustup target add x86_64-unknown-linux-gnu && rustup target add x86_64-pc-windows-gnu
+
+#    - name: Build MacOS
+#      run: cargo build --release && mv target/release/touchHLE .
+#    - uses: actions/upload-artifact@v3
+#      with:
+#        name: touchHLE_macOS_x86_64
+#        path: touchHLE
+
+    - name: Build Windows
+      run: cargo build --release --target x86_64-pc-windows-gnu --no-default-features && mv target/x86_64-pc-windows-gnu .
     - uses: actions/upload-artifact@v3
       with:
         name: touchHLE_Windows_x86_64
-        path: touchHLE.exe
+        path: x86_64-pc-windows-gnu
+        
+    - name: Build Linux
+      run: rm ./touchHLE && cargo build --release --target x86_64-unknown-linux-gnu --no-default-features && mv target/x86_64-linux-gnu .
+    - uses: actions/upload-artifact@v3
+      with:
+        name: touchHLE_linux_x86_64
+        path: x86_64-linux-gnu
