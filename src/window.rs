@@ -160,7 +160,7 @@ impl Window {
     /// display fullscreen, but SDL2 will let us control the orientation, i.e.
     /// Android devices.
     fn rotatable_fullscreen() -> bool {
-        env::consts::OS == "android"
+        env::consts::OS == "android" || env::consts::OS == "ios"
     }
 
     pub fn new(
@@ -179,13 +179,35 @@ impl Window {
         // remove this (https://github.com/touchHLE/touchHLE/issues/85).
         sdl2::hint::set("SDL_JOYSTICK_HIDAPI", "0");
 
-        if env::consts::OS == "android" {
+        if env::consts::OS == "android" || env::consts::OS == "ios" {
             // It's important to set context version BEFORE window creation
             // ref. https://wiki.libsdl.org/SDL2/SDL_GLattr
             let attr = video_ctx.gl_attr();
+
+            if env::consts::OS == "ios" {
+                attr.set_red_size(8);
+                attr.set_green_size(8);
+                attr.set_blue_size(8);
+                attr.set_alpha_size(8);
+                attr.set_depth_size(0);
+                attr.set_accelerated_visual(true);
+
+                let result = unsafe {
+                    sdl2::sys::SDL_GL_SetAttribute(sdl2::sys::SDL_GLattr::SDL_GL_RETAINED_BACKING, 0)
+                };
+                if result != 0 {
+                    panic!(
+                        "couldn't set 'retained backing' attribute: {}",
+                        sdl2::get_error()
+                    );
+                }
+            }
+
             attr.set_context_version(1, 1);
             attr.set_context_profile(sdl2::video::GLProfile::GLES);
+        }
 
+        if env::consts::OS == "android" {
             // Disable blocking of event loop when app is paused.
             sdl2::hint::set("SDL_ANDROID_BLOCK_ON_PAUSE", "0");
         }
@@ -236,7 +258,7 @@ impl Window {
             window
         };
 
-        if env::consts::OS == "android" {
+        if env::consts::OS == "android" || env::consts::OS == "ios" {
             // Sanity check
             let gl_attr = video_ctx.gl_attr();
             debug_assert_eq!(gl_attr.context_profile(), sdl2::video::GLProfile::GLES);
@@ -947,6 +969,12 @@ impl Window {
                 gles11::TEXTURE_MAG_FILTER,
                 gles11::LINEAR as _,
             );
+            gl_ctx.TexParameteri(gles11::TEXTURE_2D, gles11::TEXTURE_WRAP_S, gles11::CLAMP_TO_EDGE as _);
+            gl_ctx.TexParameteri(gles11::TEXTURE_2D, gles11::TEXTURE_WRAP_T, gles11::CLAMP_TO_EDGE as _);
+
+            // TODO: use SDL_GetWindowWMInfo() to obtain default framebuffer/renderbuffer
+            gl_ctx.BindFramebufferOES(gles11::FRAMEBUFFER_OES, 1);
+            gl_ctx.BindRenderbufferOES(gles11::RENDERBUFFER_OES, 1);
 
             present_frame(
                 gl_ctx, viewport, matrix, /* virtual_cursor_visible_at: */ None,

@@ -20,7 +20,7 @@ homepage = { workspace = true }
 
 [lib]
 # https://users.rust-lang.org/t/making-both-binary-and-cdylib-from-one-package/29105
-crate_type = ["cdylib", "rlib"]
+crate_type = ["cdylib", "rlib", "staticlib"]
 
 [[bin]]
 name = "touchHLE"
@@ -34,7 +34,8 @@ static = ["sdl2/bundled", "sdl2/static-link", "touchHLE_openal_soft_wrapper/stat
 
 [workspace.dependencies]
 cc = "1.0.83"
-cmake = "0.1.49"
+# cmake = "0.1.49"
+cmake = { git = "https://github.com/FlorianDenis/cmake-rs.git", branch = "fdenis/ios_cross_compile" }
 gl_generator = "0.14.0"
 
 [dependencies]
@@ -55,8 +56,8 @@ symphonia = { version = "0.5.3", default-features = false, features = ["aac", "i
 # behind this, but the actual HIDAPI is not used by touchHLE (see window.rs).
 # Note that the submodule in vendor/SDL2/ must use exactly the same revision of
 # SDL2 that rust-sdl2 uses, so that the Android JNI interface matches.
-sdl2 = { git = "https://github.com/hikari-no-yume/rust-sdl2.git", tag = "touchHLE-2", features = ["hidapi"] }
-sdl2-sys = { git = "https://github.com/hikari-no-yume/rust-sdl2.git", tag = "touchHLE-2" }
+sdl2 = { git = "https://github.com/ciciplusplus/rust-sdl2.git", branch = "touchHLE-2-ios", features = ["hidapi"] }
+sdl2-sys = { git = "https://github.com/ciciplusplus/rust-sdl2.git", branch = "touchHLE-2-ios" }
 touchHLE_dr_mp3_wrapper = { path = "src/audio/dr_mp3_wrapper" }
 touchHLE_dynarmic_wrapper = { path = "src/cpu/dynarmic_wrapper" }
 touchHLE_gl_bindings = { path = "src/gles/gl_bindings" }
@@ -69,3 +70,7 @@ cargo-license = "0.5.1"
 cc = { workspace = true }
 cmake = { workspace = true }
 gl_generator = { workspace = true }
+
+#[patch."https://github.com/hikari-no-yume/rust-sdl2.git"]
+#sdl2 = { path = "/Users/ac27/Dev/rust-sdl2" }
+#sdl2-sys = { path = "/Users/ac27/Dev/rust-sdl2/sdl2-sys" }
